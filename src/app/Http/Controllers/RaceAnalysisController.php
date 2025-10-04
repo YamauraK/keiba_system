@@ -96,17 +96,24 @@ class RaceAnalysisController extends Controller
     private function extractConditions(Request $request): array
     {
         $conditions = [
-            'racecourse' => $request->string('racecourse')->whenEmpty(null),
-            'course_type' => $request->string('course_type')->whenEmpty(null),
+            'racecourse' => $this->stringFilter($request, 'racecourse'),
+            'course_type' => $this->stringFilter($request, 'course_type'),
             'distance' => $request->filled('distance') ? (int) $request->input('distance') : null,
-            'weather' => $request->string('weather')->whenEmpty(null),
-            'track_condition' => $request->string('track_condition')->whenEmpty(null),
-            'direction' => $request->string('direction')->whenEmpty(null),
+            'weather' => $this->stringFilter($request, 'weather'),
+            'track_condition' => $this->stringFilter($request, 'track_condition'),
+            'direction' => $this->stringFilter($request, 'direction'),
             'date_from' => $this->parseDate($request->input('date_from')),
             'date_to' => $this->parseDate($request->input('date_to')),
         ];
 
         return array_filter($conditions, fn ($value) => $value !== null);
+    }
+
+    private function stringFilter(Request $request, string $key): ?string
+    {
+        $value = $request->string($key)->trim();
+
+        return $value->isEmpty() ? null : $value->value();
     }
 
     private function parseDate(?string $value): ?string
