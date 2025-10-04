@@ -1,61 +1,80 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 競馬データ分析システム
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+このアプリケーションは過去レース結果を蓄積し、コース条件から勝ち馬の傾向や投資シミュレーションを行える Laravel 製の管理ツールです。
 
-## About Laravel
+## 主な機能
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **CSV インポート**: 競馬場・距離・天候などの条件と出走馬情報、各種払戻データを一括登録。
+- **コース条件フィルタ**: 競馬場・コース種別・距離・天候・馬場状態・回り・開催日で絞り込み可能。
+- **勝ち馬傾向の可視化**: 枠番・馬番・人気・性別・脚質ごとの勝利数／ROI を表示。
+- **3着以内傾向**: 枠番・馬番・人気について最頻値と出現割合を確認。
+- **購入シミュレーション**: 単勝／馬単／馬連／三連単それぞれを 100 円ずつ購入した場合の ROI を算出し、予算 10,000 円の推奨戦略を提示。
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## セットアップ
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. 必要に応じて `.env` を作成し、データベース接続設定を行ってください。
+2. 依存パッケージのインストール
+   ```bash
+   composer install
+   npm install
+   ```
+3. マイグレーション実行
+   ```bash
+   php artisan migrate
+   ```
+4. アプリケーションを起動
+   ```bash
+   php artisan serve
+   ```
 
-## Learning Laravel
+> ※ このリポジトリは Docker / Sail のセットアップが含まれています。コンテナ実行の場合は `docker compose up -d` などご利用の環境に合わせて起動してください。
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## CSV インポート
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+`/import` 画面から CSV ファイルをアップロードします。1 行に 1 頭分のデータを持つ形式を想定しています。主なカラムは以下の通りです。
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| 列名 | 説明 |
+| --- | --- |
+| race_date | 開催日（YYYY-MM-DD） |
+| race_name | レース名 |
+| racecourse | 競馬場 |
+| course_type | 芝 / ダート |
+| weather | 天候 |
+| track_condition | 馬場状態 |
+| distance | 距離 (m) |
+| direction | 右 / 左 |
+| number_of_turns | コーナー数 |
+| number_of_runners | 出走頭数 |
+| frame_number | 枠番 |
+| horse_number | 馬番 |
+| horse_name | 馬名 |
+| sex | 性別 |
+| running_style | 脚質 |
+| popularity | 単勝人気 |
+| finish_position | 着順 |
+| win_odds | 単勝オッズ |
+| win_payout | 単勝払戻（100 円） |
+| place_payout | 複勝払戻（100 円） |
+| exacta_combination | 馬単の着順組み合わせ |
+| exacta_payout | 馬単払戻（100 円） |
+| quinella_combination | 馬連の組み合わせ |
+| quinella_payout | 馬連払戻（100 円） |
+| trifecta_combination | 三連単の組み合わせ |
+| trifecta_payout | 三連単払戻（100 円） |
 
-## Laravel Sponsors
+これらの列が存在しない場合でも、利用可能なデータのみ保存されます。
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 分析画面
 
-### Premium Partners
+トップページ(`/`)では、指定した条件で過去レースを抽出し、以下の情報を確認できます。
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- 条件に合致したレース数・出走頭数・平均単勝人気
+- 枠番・馬番・人気・性別・脚質別の勝利数と ROI
+- 3 着以内の最多出現枠番／馬番／人気
+- 各券種（単勝・馬単・馬連・三連単）の歴史的 ROI と 10,000 円投資時の想定収支
 
-## Contributing
+推奨プランは、ROI が最も高かった券種に 1 レース 100 円ずつ投資した場合の想定結果を文章で提示します。
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## ライセンス
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT License
